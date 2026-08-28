@@ -4,6 +4,8 @@
 
 ```text
 dependencies/
+├── font/
+│   └── ttcuyuanj     # 本机打包使用的字体 AssetBundle
 ├── melonloader/
 │   └── net6/          # MelonLoader net6 托管 DLL
 └── interop/

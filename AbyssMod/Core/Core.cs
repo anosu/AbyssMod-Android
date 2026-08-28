@@ -11,6 +11,7 @@ using Utility.Diagnostics;
 using Utility.Notifications;
 
 [assembly: MelonInfo(typeof(AbyssMod.Core), AbyssMod.ModInfo.Name, AbyssMod.ModInfo.Version, AbyssMod.ModInfo.Author)]
+[assembly: HarmonyDontPatchAll]
 
 namespace AbyssMod;
 
