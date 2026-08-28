@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>AbyssMod</AssemblyName>
+    <Product>AbyssMod</Product>
+    <Version>1.1.1</Version>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RootNamespace>AbyssMod</RootNamespace>
+    <OutputPath>bin\$(Configuration)</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <DebugType>none</DebugType>
+    <DependencyRoot Condition="'$(DependencyRoot)' == ''">$(MSBuildProjectDirectory)\..\dependencies</DependencyRoot>
+    <MelonLoaderReferenceDirectory Condition="'$(MelonLoaderReferenceDirectory)' == ''">$(DependencyRoot)\melonloader\net6</MelonLoaderReferenceDirectory>
+    <GameInteropReferenceDirectory Condition="'$(GameInteropReferenceDirectory)' == ''">$(DependencyRoot)\interop\assemblies</GameInteropReferenceDirectory>
+    <UtilityAssemblyPath Condition="'$(UtilityAssemblyPath)' == ''">$(MSBuildProjectDirectory)\..\..\Utility\Utility\bin\Release\net6.0\Utility.dll</UtilityAssemblyPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <MelonAssemblies Include="$(MelonLoaderReferenceDirectory)\*.dll" />
+    <Reference Include="@(MelonAssemblies)">
+      <Private>false</Private>
+    </Reference>
+
+    <GameAssemblies Include="$(GameInteropReferenceDirectory)\*.dll" />
+    <Reference Include="@(GameAssemblies)">
+      <Private>false</Private>
+    </Reference>
+
+    <Reference Include="Utility">
+      <HintPath>$(UtilityAssemblyPath)</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="ValidateLocalDependencies" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="!Exists('$(MelonLoaderReferenceDirectory)\MelonLoader.dll')"
+           Text="MelonLoader references were not found at '$(MelonLoaderReferenceDirectory)'. Run scripts/sync-dependencies.ps1 or override MelonLoaderReferenceDirectory." />
+    <Error Condition="!Exists('$(GameInteropReferenceDirectory)\Il2CppProject.dll')"
+           Text="Game interop references were not found at '$(GameInteropReferenceDirectory)'. Run scripts/sync-dependencies.ps1 or override GameInteropReferenceDirectory." />
+    <Error Condition="!Exists('$(UtilityAssemblyPath)')"
+           Text="Utility.dll was not found at '$(UtilityAssemblyPath)'. Build the sibling Utility project in Release first." />
+  </Target>
+</Project>

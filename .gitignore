@@ -1,0 +1,21 @@
+# IDE state
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build output
+**/bin/
+**/obj/
+artifacts/
+.build-check/
+
+# Local compile-time dependencies
+/dependencies/melonloader/
+/dependencies/interop/
+
+# Local packages and logs
+*.nupkg
+*.snupkg
+*.log
