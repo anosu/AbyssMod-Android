@@ -6,6 +6,6 @@ namespace AbyssMod;
 public static class ModInfo
 {
     public const string Name = "AbyssMod";
-    public const string Version = "1.1.1";
+    public const string Version = "1.1.2";
     public const string Author = "Jitsu";
 }

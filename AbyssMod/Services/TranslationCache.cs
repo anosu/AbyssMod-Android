@@ -265,6 +265,9 @@ public class TranslationCache
         return _manifest.GetFileHash(type);
     }
 
+    internal bool IsMissingFromManifest(string type, string id = null) =>
+        _manifest != null && GetManifestHash(type, id) == null;
+
     // ══ HTTP ═══════════════════════════════════════════════════════════════
 
     private async Task<T> GetAsync<T>(string url)

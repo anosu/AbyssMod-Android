@@ -44,7 +44,11 @@ public sealed class Core : MelonMod
             Trans.Initialize();
             PatchManager.Initialize();
 
-            Toast.Success(ModInfo.Name, $"Mod 加载成功，版本: {ModInfo.Version}");
+            Toast.Success(
+                ModInfo.Name,
+                $"Mod 加载成功，版本: {ModInfo.Version}",
+                duration: 7f
+            );
         }
         catch (Exception e)
         {

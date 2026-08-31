@@ -5,16 +5,11 @@
 *.userosscache
 *.sln.docstates
 
-# Build output
+# Build and release output
 **/bin/
 **/obj/
 artifacts/
 .build-check/
-
-# Local compile-time dependencies
-/dependencies/melonloader/
-/dependencies/interop/
-/dependencies/font/
 
 # Local packages and logs
 *.nupkg

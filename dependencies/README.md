@@ -1,23 +1,31 @@
-# 本地编译依赖
+# 构建依赖
 
-此目录只收纳 AbyssMod 的本地编译引用，二进制文件由 `.gitignore` 排除：
+此目录包含在干净环境中构建和打包 AbyssMod 所需的最小追踪输入：
 
 ```text
 dependencies/
 ├── font/
-│   └── ttcuyuanj     # 本机打包使用的字体 AssetBundle
-├── melonloader/
-│   └── net6/          # MelonLoader net6 托管 DLL
-└── interop/
-    └── assemblies/    # 当前游戏版本的 Il2CppInterop DLL
+│   └── ttcuyuanj
+├── interop/
+│   └── assemblies/    # 仅保留 Mod 项目明确引用的 DLL
+├── managed/
+│   └── Utility.dll
+└── melonloader/
+    └── net6/          # 仅保留 Mod 项目明确引用的 DLL
 ```
 
-将 MelonLoader 解压目录中 `net6/*.dll` 放入 `melonloader/net6/`，将 Patcher 生成的 `Il2CppAssemblies/*.dll` 放入 `interop/assemblies/`。`interop-manifest.json` 可以与 Interop DLL 一起保留；不要复制 `MethodAddressToToken.db`、`MethodXrefScanCache.db` 等生成缓存。
+Interop 必须由目标 Android APK 生成，不能混用 PC 代理或其他游戏版本。生成缓存和 `interop-manifest.json` 不参与编译，因此不在这里追踪。
 
-也可以在构建时覆盖默认目录，不需要复制本地文件：
+游戏更新并重新生成 Interop 后，使用同一目录构建 Utility，再刷新仓库中的最小引用集：
 
 ```powershell
-dotnet build AbyssMod-Android.slnx -c Release `
-    -p:MelonLoaderReferenceDirectory=<MelonLoader-net6目录> `
-    -p:GameInteropReferenceDirectory=<Il2CppAssemblies目录>
+dotnet build ../Utility/Utility/Utility.csproj -c Release `
+    -p:UnityProxyDir=<Il2CppAssemblies-directory>
+
+pwsh -NoProfile -File scripts/sync-dependencies.ps1 `
+    -InteropDirectory <Il2CppAssemblies-directory> `
+    -MelonLoaderDirectory <LemonLoader-net6-directory> `
+    -UtilityAssemblyPath ../Utility/Utility/bin/Release/net6.0/Utility.dll
 ```
+
+`sync-dependencies.ps1` 从 Mod 项目的显式引用读取文件名，先验证所有输入，再复制所需文件，并删除两个托管引用目录中的旧文件。字体 AssetBundle 是 Release 资源，单独维护。

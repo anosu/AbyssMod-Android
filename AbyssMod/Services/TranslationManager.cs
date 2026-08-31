@@ -121,8 +121,13 @@ public class TranslationManager
             }
             else
             {
-                Logger.Warn("MasterData static translation bundle load failed.");
-                Toast.Warning("加载失败", "MasterData 静态翻译合并包加载失败");
+                if (_cache.IsMissingFromManifest(TranslationPaths.Static))
+                    Logger.Info("MasterData static translation bundle is not translated yet.");
+                else
+                {
+                    Logger.Warn("MasterData static translation bundle load failed.");
+                    Toast.Warning("加载失败", "MasterData 静态翻译合并包加载失败");
+                }
             }
         }
 
@@ -135,7 +140,7 @@ public class TranslationManager
                 Logger.Info($"Static translation loaded [names]. Total: {names.Count}");
             }
             else
-                Logger.Warn("Static translation load failed [names]");
+                LogUnavailableStaticTranslation(TranslationPaths.Names);
         }
 
         if (uiTextsTask != null)
@@ -144,7 +149,7 @@ public class TranslationManager
             if (_uiTexts != null)
                 Logger.Info($"Static translation loaded [ui_texts]. Paths: {_uiTexts.Count}");
             else
-                Logger.Warn("Static translation load failed [ui_texts]");
+                LogUnavailableStaticTranslation(TranslationPaths.UiTexts);
         }
 
         _staticTranslationsLoaded =
@@ -234,6 +239,10 @@ public class TranslationManager
                 _novels[novelId] = translations;
                 Logger.Info($"Scenario translation loaded. Total: {translations.Count}");
             }
+            else if (_cache.IsMissingFromManifest(TranslationPaths.Novels, novelId))
+            {
+                Logger.Info($"Scenario is not translated yet: {novelId}");
+            }
             else
             {
                 Logger.Warn($"Translations loaded failed: {novelId}");
@@ -264,4 +273,12 @@ public class TranslationManager
 
     private static bool IsMasterDataStaticType(string type) =>
         type.StartsWith("m_", StringComparison.Ordinal);
+
+    private void LogUnavailableStaticTranslation(string type)
+    {
+        if (_cache.IsMissingFromManifest(type))
+            Logger.Info($"Static translation is not translated yet [{type}]");
+        else
+            Logger.Warn($"Static translation load failed [{type}]");
+    }
 }

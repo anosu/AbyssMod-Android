@@ -1,0 +1,65 @@
+name: build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Build release archive
+        shell: pwsh
+        run: |
+          $arguments = @("-Configuration", "Release")
+          if ($env:GITHUB_REF_TYPE -eq "tag") {
+              $arguments += @("-ExpectedVersion", $env:GITHUB_REF_NAME)
+          }
+          & ./scripts/build-release.ps1 @arguments
+
+      - name: Publish tagged release
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          $releaseDirectory = Join-Path "artifacts/release" $tag
+          $files = @(
+              Get-ChildItem -LiteralPath $releaseDirectory -File |
+                  Where-Object {
+                      $_.Extension -ceq ".zip" -or $_.Name -ceq "SHA256SUMS.txt"
+                  } |
+                  ForEach-Object { $_.FullName }
+          )
+          if ($files.Count -eq 0) {
+              throw "No release files were generated for $tag."
+          }
+
+          & gh release view $tag --json tagName *> $null
+          if ($LASTEXITCODE -eq 0) {
+              & gh release upload $tag @files --clobber
+          }
+          else {
+              & gh release create $tag @files `
+                  --verify-tag --generate-notes --title $tag
+          }
+          if ($LASTEXITCODE -ne 0) {
+              throw "GitHub release publication failed for $tag."
+          }

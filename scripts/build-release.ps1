@@ -2,6 +2,8 @@ param(
     [ValidateSet("Debug", "Release")]
     [string]$Configuration = "Release",
 
+    [string]$ExpectedVersion,
+
     [ValidateRange(60, 1800)]
     [int]$TimeoutSeconds = 600
 )
@@ -16,7 +18,7 @@ $dependencyRoot = Join-Path $repoRoot "dependencies"
 $interopDirectory = Join-Path $dependencyRoot "interop/assemblies"
 $melonLoaderDirectory = Join-Path $dependencyRoot "melonloader/net6"
 $fontBundle = Join-Path $dependencyRoot "font/ttcuyuanj"
-$utilityProject = Join-Path (Split-Path -Parent $repoRoot) "Utility/Utility/Utility.csproj"
+$utilityAssembly = Join-Path $dependencyRoot "managed/Utility.dll"
 $dotnet = (Get-Command dotnet -ErrorAction Stop).Source
 
 function Assert-RequiredPath {
@@ -112,7 +114,7 @@ function Get-StreamSha256 {
 }
 
 Assert-RequiredPath -Path $modProject -PathType Leaf -Label "Mod project"
-Assert-RequiredPath -Path $utilityProject -PathType Leaf -Label "Utility project"
+Assert-RequiredPath -Path $utilityAssembly -PathType Leaf -Label "Utility assembly"
 Assert-RequiredPath -Path $interopDirectory -PathType Container -Label "Game Interop directory"
 Assert-RequiredPath -Path $melonLoaderDirectory -PathType Container -Label "MelonLoader reference directory"
 Assert-RequiredPath -Path $fontBundle -PathType Leaf -Label "Font AssetBundle"
@@ -126,24 +128,12 @@ if ($version -notmatch '^[0-9]+\.[0-9]+\.[0-9]+(?:[-.][0-9A-Za-z.-]+)?$') {
     throw "The project version is missing or invalid: $version"
 }
 $releaseVersion = "v$version"
-
-$utilityBuildParameters = @{
-    FilePath = $dotnet
-    WorkingDirectory = Split-Path -Parent $utilityProject
-    TimeoutSeconds = $TimeoutSeconds
-    ArgumentList = @(
-        "build",
-        $utilityProject,
-        "-c", $Configuration,
-        "--nologo",
-        "--no-incremental",
-        "-p:UnityProxyDir=$interopDirectory"
-    )
+if (-not [string]::IsNullOrWhiteSpace($ExpectedVersion)) {
+    $normalizedExpectedVersion = $ExpectedVersion.Trim().TrimStart('v')
+    if ($normalizedExpectedVersion -cne $version) {
+        throw "Expected version '$ExpectedVersion' does not match project version '$version'."
+    }
 }
-Invoke-CheckedProcess @utilityBuildParameters
-
-$utilityAssembly = Join-Path (Split-Path -Parent $utilityProject) "bin/$Configuration/net6.0/Utility.dll"
-Assert-RequiredPath -Path $utilityAssembly -PathType Leaf -Label "Built Utility assembly"
 
 $modBuildParameters = @{
     FilePath = $dotnet
@@ -162,6 +152,13 @@ Invoke-CheckedProcess @modBuildParameters
 
 $modAssembly = Join-Path $repoRoot "AbyssMod/bin/$Configuration/AbyssMod.dll"
 Assert-RequiredPath -Path $modAssembly -PathType Leaf -Label "Built Mod assembly"
+$builtAssembly = [Reflection.Assembly]::LoadFile($modAssembly)
+$modInfoType = $builtAssembly.GetType("$($builtAssembly.GetName().Name).ModInfo", $false)
+$modInfoField = if ($null -eq $modInfoType) { $null } else { $modInfoType.GetField("Version") }
+$modInfoVersion = if ($null -eq $modInfoField) { $null } else { $modInfoField.GetRawConstantValue() }
+if ($modInfoVersion -cne $version) {
+    throw "ModInfo version '$modInfoVersion' does not match project version '$version'."
+}
 
 $releaseRoot = [System.IO.Path]::GetFullPath((Join-Path $repoRoot "artifacts/release"))
 $outputDirectory = [System.IO.Path]::GetFullPath((Join-Path $releaseRoot $releaseVersion))
