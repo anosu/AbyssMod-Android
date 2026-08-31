@@ -27,9 +27,9 @@ jobs:
       - name: Build release archive
         shell: pwsh
         run: |
-          $arguments = @("-Configuration", "Release")
+          $arguments = @{ Configuration = "Release" }
           if ($env:GITHUB_REF_TYPE -eq "tag") {
-              $arguments += @("-ExpectedVersion", $env:GITHUB_REF_NAME)
+              $arguments.ExpectedVersion = $env:GITHUB_REF_NAME
           }
           & ./scripts/build-release.ps1 @arguments
 
