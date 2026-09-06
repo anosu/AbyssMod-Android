@@ -58,7 +58,6 @@ public static class Config
 
     public static void Initialize()
     {
-        bool createPreferenceFile = !File.Exists(FilePath);
         _initializing = true;
         try
         {
@@ -68,11 +67,8 @@ public static class Config
                 _entriesBound = true;
             }
             _preferenceCategory.LoadFromFile(false);
-            if (createPreferenceFile)
-            {
-                foreach (var category in PreferenceCategories)
-                    category.SaveToFile(false);
-            }
+            foreach (var category in PreferenceCategories)
+                category.SaveToFile(false);
             TranslationEnabledAtStartup = Translation.Value;
         }
         finally
