@@ -28,13 +28,6 @@ public static class Config
         "ttcuyuanj"
     );
 
-#if DEBUG
-    public static MelonPreferences_Entry<bool> Offline;
-    public static MelonPreferences_Entry<string> OfflineAPI;
-    public static MelonPreferences_Entry<string> DmmSdkAPI;
-    public static bool OfflineStartup;
-#endif
-
     public static MelonPreferences_Entry<bool> DynamicMosaic;
     public static MelonPreferences_Entry<bool> SoundCaution;
     public static MelonPreferences_Entry<bool> VoiceInterruption;
@@ -79,23 +72,6 @@ public static class Config
 
     private static void BindAllEntries()
     {
-#if DEBUG
-        var debug = CreateCategory("Debug.Offline");
-        Offline = CreateEntry(debug, "Enabled", false, "API localization");
-        OfflineAPI = CreateEntry(
-            debug,
-            "API",
-            "http://localhost:33333/abyss/",
-            "API for debugging"
-        );
-        DmmSdkAPI = CreateEntry(
-            debug,
-            "DmmSdkAPI",
-            "http://localhost:33333/dmmsdk",
-            "API for debugging"
-        );
-#endif
-
         var general = CreateCategory("General");
         DynamicMosaic = CreateEntry(general, "DynamicMosaic", false, "是否启用游戏内动态马赛克");
         SoundCaution = CreateEntry(

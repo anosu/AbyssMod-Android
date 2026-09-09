@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using AbyssMod.Patches;
@@ -32,12 +31,6 @@ public sealed class Core : MelonMod
         try
         {
             InitializeUtility();
-
-#if DEBUG
-            var args = Environment.GetCommandLineArgs();
-            if (args.Contains("--offline") || args.Contains("-o"))
-                Config.OfflineStartup = true;
-#endif
 
             Config.Initialize();
             Initialize();

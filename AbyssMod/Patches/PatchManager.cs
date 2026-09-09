@@ -31,9 +31,6 @@ public static class PatchManager
                 harmony.PatchAll(typeof(UiTranslationPatch));
             }
             harmony.PatchAll(typeof(TranslationPatch));
-#if DEBUG
-            harmony.PatchAll(typeof(DebugPatch));
-#endif
             _harmony = harmony;
         }
         catch
