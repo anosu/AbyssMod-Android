@@ -1,3 +1,4 @@
 <Solution>
-  <Project Path="AbyssMod/AbyssMod.csproj" />
+    <Project Path="AbyssMod/AbyssMod.csproj" />
+    <Project Path="shared/Utility/Utility/Utility.csproj" />
 </Solution>

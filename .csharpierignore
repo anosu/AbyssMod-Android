@@ -1,3 +1,4 @@
 
 shared/
 SharedDependencies.local.props
+*.local.slnx

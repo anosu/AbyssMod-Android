@@ -20,3 +20,4 @@ artifacts/
 /SharedDependencies.local.props
 /dependencies/managed/Utility.dll
 /dependencies/managed/Extension.dll
+/*.local.slnx
