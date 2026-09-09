@@ -23,13 +23,14 @@ AbyssMod 的 LemonLoader Android 移植版，为 Unity IL2CPP 客户端提供中
 
 ## 构建
 
-仓库跟踪字体、Utility 和项目实际引用的最小 MelonLoader/Interop DLL，可以在干净环境中直接构建：
+Utility 通过固定提交的 Git submodule 与 `ProjectReference` 从源码构建，不再维护公共库 DLL 副本。
 
 ```powershell
+git submodule update --init --recursive
 pwsh -NoProfile -File scripts/build-release.ps1
 ```
 
-输出位于 `artifacts/release/v<version>/`。游戏或 LemonLoader 更新后，按照 [dependencies/README.md](dependencies/README.md) 使用 `scripts/sync-dependencies.ps1` 刷新最小引用集。
+输出位于 `artifacts/release/v<version>/`。本地共享开发目录、依赖升级和 CI 配置见 [docs/BUILDING.md](docs/BUILDING.md)。游戏和加载器编译引用见 [dependencies/README.md](dependencies/README.md)。
 
 ## 自动发布
 

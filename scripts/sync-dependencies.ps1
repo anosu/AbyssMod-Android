@@ -4,10 +4,7 @@ param(
     [string]$InteropDirectory,
 
     [Parameter(Mandatory)]
-    [string]$MelonLoaderDirectory,
-
-    [Parameter(Mandatory)]
-    [string]$UtilityAssemblyPath
+    [string]$MelonLoaderDirectory
 )
 
 $ErrorActionPreference = "Stop"
@@ -15,12 +12,11 @@ $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $dependencyRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot "dependencies"))
 $interopTarget = Join-Path $dependencyRoot "interop/assemblies"
 $melonLoaderTarget = Join-Path $dependencyRoot "melonloader/net6"
-$utilityTarget = Join-Path $dependencyRoot "managed/Utility.dll"
 
 $projects = @(
     Get-ChildItem -LiteralPath $repoRoot -Filter "*.csproj" -File -Recurse |
         Where-Object {
-            $_.FullName -notmatch '[\\/](?:bin|obj|dependencies)[\\/]'
+            [IO.Path]::GetRelativePath($repoRoot, $_.FullName) -notmatch '(^|[\\/])(?:bin|obj|dependencies|shared|artifacts|\.build-check)[\\/]'
         }
 )
 if ($projects.Count -ne 1) {
@@ -110,22 +106,10 @@ if ($interopReferences.Count -eq 0 -or $melonLoaderReferences.Count -eq 0) {
     throw "The Mod project does not declare tracked Interop and MelonLoader references."
 }
 
-$utilitySource = [IO.Path]::GetFullPath($UtilityAssemblyPath)
-$utilityDestination = Assert-DependencyTarget -Path $utilityTarget
-if (-not (Test-Path -LiteralPath $utilitySource -PathType Leaf)) {
-    throw "Utility assembly is missing: $utilitySource"
-}
-if ($utilitySource -ieq $utilityDestination) {
-    throw "Utility source and destination must differ: $utilitySource"
-}
-
 Sync-ReferenceSet -SourceDirectory $InteropDirectory -DestinationDirectory $interopTarget -Names $interopReferences
 Sync-ReferenceSet -SourceDirectory $MelonLoaderDirectory -DestinationDirectory $melonLoaderTarget -Names $melonLoaderReferences
 
-[void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($utilityDestination))
-Copy-Item -LiteralPath $utilitySource -Destination $utilityDestination -Force
 
 Write-Host "Synchronized $($projects[0].Name):"
 Write-Host "  Interop references: $($interopReferences.Count)"
 Write-Host "  MelonLoader references: $($melonLoaderReferences.Count)"
-Write-Host "  Utility: $utilityDestination"

@@ -15,3 +15,8 @@ artifacts/
 *.nupkg
 *.snupkg
 *.log
+
+# Local shared-source overrides and obsolete binary copies
+/SharedDependencies.local.props
+/dependencies/managed/Utility.dll
+/dependencies/managed/Extension.dll

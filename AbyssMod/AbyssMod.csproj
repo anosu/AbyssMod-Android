@@ -12,43 +12,107 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <DebugType>none</DebugType>
-    <DependencyRoot Condition="'$(DependencyRoot)' == ''">$(MSBuildProjectDirectory)/../dependencies</DependencyRoot>
-    <MelonLoaderReferenceDirectory Condition="'$(MelonLoaderReferenceDirectory)' == ''">$(DependencyRoot)/melonloader/net6</MelonLoaderReferenceDirectory>
-    <GameInteropReferenceDirectory Condition="'$(GameInteropReferenceDirectory)' == ''">$(DependencyRoot)/interop/assemblies</GameInteropReferenceDirectory>
-    <UtilityAssemblyPath Condition="'$(UtilityAssemblyPath)' == ''">$(DependencyRoot)/managed/Utility.dll</UtilityAssemblyPath>
+    <DependencyRoot Condition="'$(DependencyRoot)' == ''"
+      >$(MSBuildProjectDirectory)/../dependencies</DependencyRoot>
+    <MelonLoaderReferenceDirectory Condition="'$(MelonLoaderReferenceDirectory)' == ''"
+      >$(DependencyRoot)/melonloader/net6</MelonLoaderReferenceDirectory>
+    <GameInteropReferenceDirectory Condition="'$(GameInteropReferenceDirectory)' == ''"
+      >$(DependencyRoot)/interop/assemblies</GameInteropReferenceDirectory>
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="0Harmony" HintPath="$(MelonLoaderReferenceDirectory)/0Harmony.dll" Private="false" />
-    <Reference Include="Il2CppInterop.Runtime" HintPath="$(MelonLoaderReferenceDirectory)/Il2CppInterop.Runtime.dll" Private="false" />
-    <Reference Include="MelonLoader" HintPath="$(MelonLoaderReferenceDirectory)/MelonLoader.dll" Private="false" />
+    <Reference
+      Include="0Harmony"
+      HintPath="$(MelonLoaderReferenceDirectory)/0Harmony.dll"
+      Private="false"
+    />
+    <Reference
+      Include="Il2CppInterop.Runtime"
+      HintPath="$(MelonLoaderReferenceDirectory)/Il2CppInterop.Runtime.dll"
+      Private="false"
+    />
+    <Reference
+      Include="MelonLoader"
+      HintPath="$(MelonLoaderReferenceDirectory)/MelonLoader.dll"
+      Private="false"
+    />
 
-    <Reference Include="Il2CppAbsf" HintPath="$(GameInteropReferenceDirectory)/Il2CppAbsf.dll" Private="false" />
-    <Reference Include="Il2CppLive2D.Cubism" HintPath="$(GameInteropReferenceDirectory)/Il2CppLive2D.Cubism.dll" Private="false" />
-    <Reference Include="Il2Cppmscorlib" HintPath="$(GameInteropReferenceDirectory)/Il2Cppmscorlib.dll" Private="false" />
-    <Reference Include="Il2CppProject" HintPath="$(GameInteropReferenceDirectory)/Il2CppProject.dll" Private="false" />
-    <Reference Include="Il2CppUniRx" HintPath="$(GameInteropReferenceDirectory)/Il2CppUniRx.dll" Private="false" />
-    <Reference Include="Unity.TextMeshPro" HintPath="$(GameInteropReferenceDirectory)/Unity.TextMeshPro.dll" Private="false" />
-    <Reference Include="UnityEngine.AssetBundleModule" HintPath="$(GameInteropReferenceDirectory)/UnityEngine.AssetBundleModule.dll" Private="false" />
-    <Reference Include="UnityEngine.CoreModule" HintPath="$(GameInteropReferenceDirectory)/UnityEngine.CoreModule.dll" Private="false" />
-    <Reference Include="UnityEngine.IMGUIModule" HintPath="$(GameInteropReferenceDirectory)/UnityEngine.IMGUIModule.dll" Private="false" />
-    <Reference Include="UnityEngine.SharedInternalsModule" HintPath="$(GameInteropReferenceDirectory)/UnityEngine.SharedInternalsModule.dll" Private="false" />
-    <Reference Include="UnityEngine.TextRenderingModule" HintPath="$(GameInteropReferenceDirectory)/UnityEngine.TextRenderingModule.dll" Private="false" />
-    <Reference Include="UnityEngine.UI" HintPath="$(GameInteropReferenceDirectory)/UnityEngine.UI.dll" Private="false" />
-    <Reference Include="UnityEngine.UnityWebRequestModule" HintPath="$(GameInteropReferenceDirectory)/UnityEngine.UnityWebRequestModule.dll" Private="false" />
-
-    <Reference Include="Utility">
-      <HintPath>$(UtilityAssemblyPath)</HintPath>
-      <Private>true</Private>
-    </Reference>
+    <Reference
+      Include="Il2CppAbsf"
+      HintPath="$(GameInteropReferenceDirectory)/Il2CppAbsf.dll"
+      Private="false"
+    />
+    <Reference
+      Include="Il2CppLive2D.Cubism"
+      HintPath="$(GameInteropReferenceDirectory)/Il2CppLive2D.Cubism.dll"
+      Private="false"
+    />
+    <Reference
+      Include="Il2Cppmscorlib"
+      HintPath="$(GameInteropReferenceDirectory)/Il2Cppmscorlib.dll"
+      Private="false"
+    />
+    <Reference
+      Include="Il2CppProject"
+      HintPath="$(GameInteropReferenceDirectory)/Il2CppProject.dll"
+      Private="false"
+    />
+    <Reference
+      Include="Il2CppUniRx"
+      HintPath="$(GameInteropReferenceDirectory)/Il2CppUniRx.dll"
+      Private="false"
+    />
+    <Reference
+      Include="Unity.TextMeshPro"
+      HintPath="$(GameInteropReferenceDirectory)/Unity.TextMeshPro.dll"
+      Private="false"
+    />
+    <Reference
+      Include="UnityEngine.AssetBundleModule"
+      HintPath="$(GameInteropReferenceDirectory)/UnityEngine.AssetBundleModule.dll"
+      Private="false"
+    />
+    <Reference
+      Include="UnityEngine.CoreModule"
+      HintPath="$(GameInteropReferenceDirectory)/UnityEngine.CoreModule.dll"
+      Private="false"
+    />
+    <Reference
+      Include="UnityEngine.IMGUIModule"
+      HintPath="$(GameInteropReferenceDirectory)/UnityEngine.IMGUIModule.dll"
+      Private="false"
+    />
+    <Reference
+      Include="UnityEngine.SharedInternalsModule"
+      HintPath="$(GameInteropReferenceDirectory)/UnityEngine.SharedInternalsModule.dll"
+      Private="false"
+    />
+    <Reference
+      Include="UnityEngine.TextRenderingModule"
+      HintPath="$(GameInteropReferenceDirectory)/UnityEngine.TextRenderingModule.dll"
+      Private="false"
+    />
+    <Reference
+      Include="UnityEngine.UI"
+      HintPath="$(GameInteropReferenceDirectory)/UnityEngine.UI.dll"
+      Private="false"
+    />
+    <Reference
+      Include="UnityEngine.UnityWebRequestModule"
+      HintPath="$(GameInteropReferenceDirectory)/UnityEngine.UnityWebRequestModule.dll"
+      Private="false"
+    />
   </ItemGroup>
 
   <Target Name="ValidateLocalDependencies" BeforeTargets="ResolveAssemblyReferences">
-    <Error Condition="!Exists('$(MelonLoaderReferenceDirectory)/MelonLoader.dll')"
-           Text="MelonLoader references were not found at '$(MelonLoaderReferenceDirectory)'. Run scripts/sync-dependencies.ps1 or override MelonLoaderReferenceDirectory." />
-    <Error Condition="!Exists('$(GameInteropReferenceDirectory)/Il2CppProject.dll')"
-           Text="Game interop references were not found at '$(GameInteropReferenceDirectory)'. Run scripts/sync-dependencies.ps1 or override GameInteropReferenceDirectory." />
-    <Error Condition="!Exists('$(UtilityAssemblyPath)')"
-           Text="Utility.dll was not found at '$(UtilityAssemblyPath)'. Run scripts/sync-dependencies.ps1 or override UtilityAssemblyPath." />
+    <Error
+      Condition="!Exists('$(MelonLoaderReferenceDirectory)/MelonLoader.dll')"
+      Text="MelonLoader references were not found at '$(MelonLoaderReferenceDirectory)'. Run scripts/sync-dependencies.ps1 or override MelonLoaderReferenceDirectory."
+    />
+    <Error
+      Condition="!Exists('$(GameInteropReferenceDirectory)/Il2CppProject.dll')"
+      Text="Game interop references were not found at '$(GameInteropReferenceDirectory)'. Run scripts/sync-dependencies.ps1 or override GameInteropReferenceDirectory."
+    />
   </Target>
+  <Import Project="../build/SharedDependencies.props" />
 </Project>
