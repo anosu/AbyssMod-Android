@@ -18,6 +18,6 @@ artifacts/
 
 # Local shared-source overrides and obsolete binary copies
 /SharedDependencies.local.props
-/dependencies/managed/Utility.dll
-/dependencies/managed/Extension.dll
+# Retired DLL-copy directory; shared libraries are built from source
+/dependencies/managed/
 /*.local.slnx
