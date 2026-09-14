@@ -1,4 +1,9 @@
-
-shared/
-SharedDependencies.local.props
-*.local.slnx
+**/bin/**
+**/obj/**
+dependencies/**
+shared/**
+artifacts/**
+*.local.*
+build/**
+Directory.Build.targets
+*.slnx

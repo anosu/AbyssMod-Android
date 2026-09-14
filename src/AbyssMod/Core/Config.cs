@@ -17,16 +17,10 @@ public static class Config
         MelonEnvironment.UserDataDirectory,
         $"{ModInfo.Name}.cfg"
     );
-    internal static string DefaultFontBundlePath => Path.Combine(
-        MelonEnvironment.UserDataDirectory,
-        ModInfo.Name,
-        "ttcuyuanj"
-    );
-    internal static string LegacyFontBundlePath => Path.Combine(
-        Application.persistentDataPath,
-        "il2cpp",
-        "ttcuyuanj"
-    );
+    internal static string DefaultFontBundlePath =>
+        Path.Combine(MelonEnvironment.UserDataDirectory, ModInfo.Name, "ttcuyuanj");
+    internal static string LegacyFontBundlePath =>
+        Path.Combine(Application.persistentDataPath, "il2cpp", "ttcuyuanj");
 
     public static MelonPreferences_Entry<bool> DynamicMosaic;
     public static MelonPreferences_Entry<bool> SoundCaution;

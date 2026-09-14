@@ -21,3 +21,10 @@ artifacts/
 # Retired DLL-copy directory; shared libraries are built from source
 /dependencies/managed/
 /*.local.slnx
+
+artifacts/
+**/bin/
+**/obj/
+*.local.slnx
+SharedDependencies.local.props
+Build.local.props

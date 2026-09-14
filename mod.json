@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "repository": "AbyssMod-Android",
+  "github": "anosu/AbyssMod-Android",
+  "kind": "android",
+  "assembly": "AbyssMod",
+  "project": "src/AbyssMod/AbyssMod.csproj",
+  "tests": [],
+  "useExtension": false,
+  "package": {
+    "name": "AbyssMod-Android.zip",
+    "files": [
+      {
+        "destination": "Mods/AbyssMod/AbyssMod.dll",
+        "source": "output/AbyssMod.dll"
+      },
+      {
+        "destination": "Mods/AbyssMod/Utility.dll",
+        "source": "output/Utility.dll"
+      },
+      {
+        "destination": "UserData/AbyssMod/ttcuyuanj",
+        "source": "dependencies/font/ttcuyuanj"
+      }
+    ]
+  },
+  "engineeringRevision": "0b038f40808e29dcd31c2de5df14f2f37953ca34"
+}

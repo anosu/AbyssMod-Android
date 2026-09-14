@@ -9,7 +9,12 @@ using MelonLoader.Utils;
 using Utility.Diagnostics;
 using Utility.Notifications;
 
-[assembly: MelonInfo(typeof(AbyssMod.Core), AbyssMod.ModInfo.Name, AbyssMod.ModInfo.Version, AbyssMod.ModInfo.Author)]
+[assembly: MelonInfo(
+    typeof(AbyssMod.Core),
+    AbyssMod.ModInfo.Name,
+    AbyssMod.ModInfo.Version,
+    AbyssMod.ModInfo.Author
+)]
 [assembly: HarmonyDontPatchAll]
 
 namespace AbyssMod;
@@ -37,11 +42,7 @@ public sealed class Core : MelonMod
             Trans.Initialize();
             PatchManager.Initialize();
 
-            Toast.Success(
-                ModInfo.Name,
-                $"Mod 加载成功，版本: {ModInfo.Version}",
-                duration: 7f
-            );
+            Toast.Success(ModInfo.Name, $"Mod 加载成功，版本: {ModInfo.Version}", duration: 7f);
         }
         catch (Exception e)
         {
@@ -92,9 +93,10 @@ public sealed class Core : MelonMod
     {
         Logging.SetSink(entry =>
         {
-            string text = entry.Exception == null
-                ? $"[{entry.Category}] {entry.Message}"
-                : $"[{entry.Category}] {entry.Message}\n{entry.Exception}";
+            string text =
+                entry.Exception == null
+                    ? $"[{entry.Category}] {entry.Message}"
+                    : $"[{entry.Category}] {entry.Message}\n{entry.Exception}";
 
             switch (entry.Level)
             {
@@ -139,10 +141,7 @@ public sealed class Core : MelonMod
             _httpClient
         );
 
-        Trans = new TranslationManager(
-            cache,
-            ResolveFontBundlePath(Config.FontBundlePath.Value)
-        );
+        Trans = new TranslationManager(cache, ResolveFontBundlePath(Config.FontBundlePath.Value));
     }
 
     private static string ResolveFontBundlePath(string path)

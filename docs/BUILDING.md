@@ -1,57 +1,46 @@
-# 源码依赖与构建
+# 构建与工程维护
 
-## 干净克隆与 CI
+项目入口：`src/AbyssMod/AbyssMod.csproj`。标准方案：`AbyssMod-Android.slnx`。
+
+## 准备
+
+安装 global.json 指定的 .NET SDK、.NET 8 测试运行时、Python 3.10+、PowerShell 7。VS 使用 2022 17.14 或更新版本。
 
 ```sh
-git clone --recurse-submodules https://github.com/anosu/AbyssMod-Android.git
+git submodule update --init --recursive
+python shared/ModEngineering/scripts/mod.py check
+python shared/ModEngineering/scripts/mod.py test
+python shared/ModEngineering/scripts/mod.py build --configuration Debug
+python shared/ModEngineering/scripts/mod.py build --configuration Release
 ```
 
-已有克隆运行 `git submodule update --init --recursive`。仓库固定每个公共库的提交，CI 不追踪依赖的最新分支。
+引用只使用游戏/加载器必要 DLL；具体资源和游戏差异见 [dependencies](../dependencies/README.md)（若项目未提供该文件，以项目的 Reference 声明为准）。完整游戏导出和本机路径不提交。
+
+## 本地共享源码联调
+
+标准方案包含仓库固定的共享项目。需要编辑同级 Utility/Extension 时，将 `SharedDependencies.local.props.example` 复制为忽略 Git 的 `SharedDependencies.local.props`，调整路径后运行：
+
+```sh
+python shared/ModEngineering/scripts/mod.py solution --local
+```
+
+打开生成的 `AbyssMod-Android.local.slnx`。已有本地覆盖不应被模板覆盖。CI 和 `UsePinnedSharedDependencies=true` 总是使用固定源码；标准 VS 方案也忽略本地覆盖。无需复制共享 DLL。
+
+## 规范与升级
+
+`mod.json` 是项目工程清单，声明平台、项目、测试及发行文件。重复构建逻辑来自固定的 ModEngineering 子模块。生成文件改动应在公共实现或清单中完成，然后执行 `mod.py sync`；`mod.py check` 检测漂移和格式问题。
+
+更新工程用 `mod.py update --revision <commit>`，更新运行库增加 `--dependency Utility` 或 `--dependency Extension`。更新后验证并提交子模块指针。标准 Android 的游戏公共改动先提交上游，Variant 通过 `git fetch upstream`、`git merge upstream/main` 合并，保留私有差异。
+
+详见 [公共规范](../shared/ModEngineering/docs/CONVENTIONS.md)。
+
+## Android 发布
 
 ```powershell
 pwsh -NoProfile -File scripts/build-release.ps1
+pwsh -NoProfile -File scripts/build-release.ps1 -ExpectedVersion v1.0.0
 ```
 
-ProjectReference 自动构建公共库并复制 DLL 到 `AbyssMod/bin/Release/`。打包脚本从这里取文件。
+示例版本必须替换成项目实际版本。版本仅维护在 csproj 的 Version 中，ModInfo.Version 在编译时生成。打包只使用固定共享源码，输出到 artifacts/release/v<版本>/，校验 ZIP 条目、内容哈希及程序集版本。
 
-## 本地联调
-
-将 `SharedDependencies.local.props.example` 复制为 `SharedDependencies.local.props`。默认引用上一级目录中的 Utility；也可在文件中改为其他路径。
-
-该文件不进入 Git。启用后，修改公共库源码再构建 Mod 即可，无需复制 DLL。CI 自动忽略本地配置。
-
-需要在本地验证固定的子模块版本时：
-
-```powershell
-dotnet build AbyssMod/AbyssMod.csproj -c Release -p:UsePinnedSharedDependencies=true
-```
-
-临时设置环境变量 `CI=true` 后运行打包脚本，可以检查与 CI 相同的源码选择。
-
-公共库的输出和中间目录位于当前 Mod 的 `artifacts/shared/local/` 或 `artifacts/shared/pinned/`，不同 Mod 不会覆盖同一份 Utility/Extension 的构建缓存。Utility 使用自身仓库中固定的 7 个 Unity/Interop 编译引用；Mod 继续使用本游戏的 Interop。Extension 使用自身固定的 MelonLoader 编译引用。
-
-## 更新公共库
-
-先在公共库仓库提交并推送源码，再在本 Mod 中更新子模块：
-
-```sh
-git -C shared/Utility fetch origin
-git -C shared/Utility checkout <tested-commit>
-git add shared/Utility
-```
-
-完成固定版本的构建验证后，将子模块指针与 Mod 改动一并提交。普通分支推送只构建验证，现有 `v*` 标签发布规则保持不变。
-
-## Visual Studio
-
-标准解决方案已包含固定版本的 Utility 项目。在 VS 中打开标准解决方案时，不应用 `SharedDependencies.local.props` 的本地源码覆盖。
-
-如果需要在 VS 中同时修改同级 Utility，先配置 `SharedDependencies.local.props`，然后在本仓库运行：
-
-```powershell
-pwsh -NoProfile -File shared/Utility/scripts/New-ModSolution.ps1 -Project AbyssMod/AbyssMod.csproj
-```
-
-打开生成的 `AbyssMod-Android.local.slnx`（需要 VS 2022 17.14 或更新版本）。它包含实际引用的共享项目，忽略 Git 追踪；修改共享项目路径后重新运行该命令。不要只向标准解决方案添加本机路径后提交。
-
-VS 使用共享项目自身的 `bin` / `obj` 输出，以保证解决方案构建和项目引用查找一致；命令行项目构建继续使用本仓库 `artifacts/shared` 下的隔离目录。
+普通 push/PR 做检查、测试和打包验证，不上传 Actions 测试包；匹配项目版本的 v 标签自动发布 ZIP 和 SHA256SUMS.txt。工程迁移不自动更改版本或移动旧标签。
