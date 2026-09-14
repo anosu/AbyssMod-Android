@@ -17,7 +17,7 @@ Interop 必须由目标 Android APK 生成，不能混用 PC 代理或其他游�
 游戏更新并重新生成 Interop 后，刷新仓库中的最小引用集：
 
 ```powershell
-pwsh -NoProfile -File scripts/sync-dependencies.ps1 `
+pwsh -NoProfile -File shared/ModEngineering/scripts/sync-dependencies.ps1 -RepositoryRoot . `
     -InteropDirectory <Il2CppAssemblies-directory> `
     -MelonLoaderDirectory <LemonLoader-net6-directory>
 ```
@@ -26,7 +26,7 @@ pwsh -NoProfile -File scripts/sync-dependencies.ps1 `
 
 ## 共享库
 
-Utility 通过 `shared/Utility` 源码子模块和 `ProjectReference` 构建。更新共享库时更新源码和子模块指针，或使用本地源码覆盖配置，具体见 [构建说明](../docs/BUILDING.md)。
+Utility 通过 `shared/Utility` 源码子模块和 `ProjectReference` 构建。更新共享库时更新源码和子模块指针，或使用本地源码覆盖配置，具体见 [构建说明](https://github.com/anosu/ModEngineering/blob/main/docs/CONVENTIONS.md)。
 
 构建会自动将共享库 DLL 复制到 Mod 输出目录，发布脚本从该目录打包。`dependencies/managed/` 已废弃，不参与编译或打包，整目录忽略 Git；旧克隆中的该目录可直接删除，无需重新复制 DLL。
 
