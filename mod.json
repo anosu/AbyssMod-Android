@@ -5,7 +5,9 @@
   "kind": "android",
   "assembly": "AbyssMod",
   "project": "src/AbyssMod/AbyssMod.csproj",
-  "tests": [],
+  "tests": [
+    "tests/AbyssMod.Cache.Tests/AbyssMod.Cache.Tests.csproj"
+  ],
   "package": {
     "name": "AbyssMod-Android.zip",
     "files": [
