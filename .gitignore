@@ -20,5 +20,7 @@ artifacts/
 /SharedDependencies.local.props
 # Retired DLL-copy directory; shared libraries are built from source
 /dependencies/managed/
+# Local full game Interop export
+/dependencies/interop-backup/
 /*.local.slnx
 /Build.local.props
