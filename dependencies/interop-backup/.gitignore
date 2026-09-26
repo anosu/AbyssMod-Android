@@ -1,0 +1,3 @@
+# Keep the local full Interop export out of Git.
+*
+!.gitignore

@@ -8,21 +8,22 @@ dependencies/
 │   └── ttcuyuanj
 ├── interop/
 │   └── assemblies/    # 仅保留 Mod 项目明确引用的 DLL
+├── interop-backup/   # 本机完整导出；仅 .gitignore 进入 Git
 └── melonloader/
     └── net6/          # 仅保留 Mod 项目明确引用的 DLL
 ```
 
-Interop 必须由目标 Android APK 生成，不能混用 PC 代理或其他游戏版本。生成缓存和 `interop-manifest.json` 不参与编译，因此不在这里追踪。
+Interop 必须由目标 Android APK 生成，不能混用 PC 代理或其他游戏版本。把完整导出（包括生成清单和缓存）放进 `interop-backup/`；该目录只追踪忽略规则。`interop/assemblies/` 仅追踪项目编译所需的 DLL，可从完整导出反复同步。
 
 游戏更新并重新生成 Interop 后，刷新仓库中的最小引用集：
 
 ```powershell
 pwsh -NoProfile -File shared/ModEngineering/scripts/sync-dependencies.ps1 -RepositoryRoot . `
-    -InteropDirectory <Il2CppAssemblies-directory> `
+    -InteropDirectory dependencies/interop-backup `
     -MelonLoaderDirectory <LemonLoader-net6-directory>
 ```
 
-`sync-dependencies.ps1` 从 Mod 项目的显式引用读取文件名，先验证所有输入，再复制所需文件，并删除两个托管引用目录中的旧文件。字体 AssetBundle 是 Release 资源，单独维护。
+`sync-dependencies.ps1` 从 Mod 项目的显式引用读取文件名，先验证所有输入，再复制项目明确引用的文件；如需移除不再引用的旧 DLL，应单独清理。字体 AssetBundle 是 Release 资源，单独维护。
 
 ## 共享库
 
