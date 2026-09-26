@@ -1,82 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <Import Project="$(ModRepositoryRoot)shared/ModEngineering/build/Android.props" />
     <PropertyGroup>
-        <AssemblyName>AbyssMod</AssemblyName>
-        <Product>AbyssMod</Product>
         <Version>1.1.2</Version>
         <Nullable>disable</Nullable>
-        <ImplicitUsings>disable</ImplicitUsings>
-        <RootNamespace>AbyssMod</RootNamespace>
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     </PropertyGroup>
 
-    <ItemGroup>
-        <Reference
-            Include="Il2CppAbsf"
-            HintPath="$(GameInteropReferenceDirectory)/Il2CppAbsf.dll"
-            Private="false"
-        />
-        <Reference
-            Include="Il2CppLive2D.Cubism"
-            HintPath="$(GameInteropReferenceDirectory)/Il2CppLive2D.Cubism.dll"
-            Private="false"
-        />
-        <Reference
-            Include="Il2Cppmscorlib"
-            HintPath="$(GameInteropReferenceDirectory)/Il2Cppmscorlib.dll"
-            Private="false"
-        />
-        <Reference
-            Include="Il2CppProject"
-            HintPath="$(GameInteropReferenceDirectory)/Il2CppProject.dll"
-            Private="false"
-        />
-        <Reference
-            Include="Il2CppUniRx"
-            HintPath="$(GameInteropReferenceDirectory)/Il2CppUniRx.dll"
-            Private="false"
-        />
-        <Reference
-            Include="Unity.TextMeshPro"
-            HintPath="$(GameInteropReferenceDirectory)/Unity.TextMeshPro.dll"
-            Private="false"
-        />
-        <Reference
-            Include="UnityEngine.AssetBundleModule"
-            HintPath="$(GameInteropReferenceDirectory)/UnityEngine.AssetBundleModule.dll"
-            Private="false"
-        />
-        <Reference
-            Include="UnityEngine.CoreModule"
-            HintPath="$(GameInteropReferenceDirectory)/UnityEngine.CoreModule.dll"
-            Private="false"
-        />
-        <Reference
-            Include="UnityEngine.IMGUIModule"
-            HintPath="$(GameInteropReferenceDirectory)/UnityEngine.IMGUIModule.dll"
-            Private="false"
-        />
-        <Reference
-            Include="UnityEngine.SharedInternalsModule"
-            HintPath="$(GameInteropReferenceDirectory)/UnityEngine.SharedInternalsModule.dll"
-            Private="false"
-        />
-        <Reference
-            Include="UnityEngine.TextRenderingModule"
-            HintPath="$(GameInteropReferenceDirectory)/UnityEngine.TextRenderingModule.dll"
-            Private="false"
-        />
-        <Reference
-            Include="UnityEngine.UI"
-            HintPath="$(GameInteropReferenceDirectory)/UnityEngine.UI.dll"
-            Private="false"
-        />
-        <Reference
-            Include="UnityEngine.UnityWebRequestModule"
-            HintPath="$(GameInteropReferenceDirectory)/UnityEngine.UnityWebRequestModule.dll"
-            Private="false"
-        />
-    </ItemGroup>
     <Import Project="$(ModRepositoryRoot)shared/ModEngineering/build/SharedDependencies.props" />
     <Target Name="CollectExtraPackageFiles" BeforeTargets="GetModPackageFiles">
         <ItemGroup>
