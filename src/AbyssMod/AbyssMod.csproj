@@ -1,42 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="$(ModRepositoryRoot)shared/ModEngineering/build/Android.props" />
     <PropertyGroup>
-        <ModPlatform>android</ModPlatform>
-        <TargetFramework>net6.0</TargetFramework>
         <AssemblyName>AbyssMod</AssemblyName>
         <Product>AbyssMod</Product>
         <Version>1.1.2</Version>
-        <LangVersion>latest</LangVersion>
         <Nullable>disable</Nullable>
         <ImplicitUsings>disable</ImplicitUsings>
         <RootNamespace>AbyssMod</RootNamespace>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-        <DebugType>none</DebugType>
-        <DependencyRoot Condition="'$(DependencyRoot)' == ''"
-            >$(ModRepositoryRoot)dependencies</DependencyRoot>
-        <MelonLoaderReferenceDirectory Condition="'$(MelonLoaderReferenceDirectory)' == ''"
-            >$(DependencyRoot)/melonloader/net6</MelonLoaderReferenceDirectory>
-        <GameInteropReferenceDirectory Condition="'$(GameInteropReferenceDirectory)' == ''"
-            >$(DependencyRoot)/interop/assemblies</GameInteropReferenceDirectory>
     </PropertyGroup>
 
     <ItemGroup>
-        <Reference
-            Include="0Harmony"
-            HintPath="$(MelonLoaderReferenceDirectory)/0Harmony.dll"
-            Private="false"
-        />
-        <Reference
-            Include="Il2CppInterop.Runtime"
-            HintPath="$(MelonLoaderReferenceDirectory)/Il2CppInterop.Runtime.dll"
-            Private="false"
-        />
-        <Reference
-            Include="MelonLoader"
-            HintPath="$(MelonLoaderReferenceDirectory)/MelonLoader.dll"
-            Private="false"
-        />
-
         <Reference
             Include="Il2CppAbsf"
             HintPath="$(GameInteropReferenceDirectory)/Il2CppAbsf.dll"
