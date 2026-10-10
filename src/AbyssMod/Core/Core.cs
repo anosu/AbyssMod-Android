@@ -1,11 +1,14 @@
 using System;
+using System.Collections;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using AbyssMod.Patches;
 using AbyssMod.Services;
+using Il2CppTMPro;
 using MelonLoader;
 using MelonLoader.Utils;
+using Utility.Assets;
 using Utility.Diagnostics;
 using Utility.Notifications;
 
@@ -28,6 +31,9 @@ public sealed class Core : MelonMod
     public static MelonLogger.Instance Log { get; private set; }
     public static TranslationManager Trans;
     private static HttpClient _httpClient;
+    private static AssetBundleLoader<TMP_FontAsset> _font;
+    private static IEnumerator _fontLoad;
+    private static object _fontCoroutine;
 
     public override void OnInitializeMelon()
     {
@@ -40,6 +46,7 @@ public sealed class Core : MelonMod
             Config.Initialize();
             Initialize();
             Trans.Initialize();
+            InitializeFont();
             PatchManager.Initialize();
 
             Toast.Success(ModInfo.Name, $"Mod 加载成功，版本: {ModInfo.Version}", duration: 7f);
@@ -75,6 +82,15 @@ public sealed class Core : MelonMod
                 Log?.Error($"Translation shutdown failed: {e}");
             }
             Trans = null;
+            Config.Shutdown();
+            if (_fontCoroutine != null)
+                MelonCoroutines.Stop(_fontCoroutine);
+            (_fontLoad as IDisposable)?.Dispose();
+            if (_font?.IsLoaded == true)
+                TMP_Settings.fallbackFontAssets.Remove(_font.Asset);
+            _font = null;
+            _fontLoad = null;
+            _fontCoroutine = null;
             _httpClient?.Dispose();
             _httpClient = null;
             try
@@ -125,7 +141,12 @@ public sealed class Core : MelonMod
             PooledConnectionLifetime = TimeSpan.FromMinutes(PooledConnectionLifetimeMinutes),
             PooledConnectionIdleTimeout = TimeSpan.FromMinutes(PooledConnectionIdleTimeoutMinutes),
         };
-        _httpClient = new HttpClient(new CryptoHandler(handler))
+        _httpClient = new HttpClient(
+            new TranslationCryptoHandler(
+                handler,
+                () => (Config.TranslationCryptoTag.Value, Config.TranslationCryptoKey.Value)
+            )
+        )
         {
             Timeout = TimeSpan.FromSeconds(HttpTimeoutSeconds),
         };
@@ -141,7 +162,24 @@ public sealed class Core : MelonMod
             _httpClient
         );
 
-        Trans = new TranslationManager(cache, ResolveFontBundlePath(Config.FontBundlePath.Value));
+        Trans = new TranslationManager(cache);
+    }
+
+    private static void InitializeFont()
+    {
+        _font = new AssetBundleLoader<TMP_FontAsset>(
+            ResolveFontBundlePath(Config.FontBundlePath.Value)
+        );
+        _fontLoad = _font.Load(
+            () =>
+            {
+                if (!TMP_Settings.fallbackFontAssets.Contains(_font.Asset))
+                    TMP_Settings.fallbackFontAssets.Add(_font.Asset);
+                Logger.Info($"Font loaded: {_font.Asset.name}");
+            },
+            error => Toast.Error("字体加载失败", error.Message)
+        );
+        _fontCoroutine = MelonCoroutines.Start(_fontLoad);
     }
 
     private static string ResolveFontBundlePath(string path)

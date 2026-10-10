@@ -26,16 +26,21 @@ public static class EnhancePatch
     [HarmonyPatch(typeof(NovelLive2DObject), nameof(NovelLive2DObject.Initialize))]
     public static void DisableMosaic(NovelLive2DObject __instance)
     {
-        if (Config.DynamicMosaic.Value)
-            return;
-
         var drawables = __instance.GetDrawables();
         if (drawables == null)
             return;
 
         foreach (var d in drawables)
         {
-            if (d.name.StartsWith("Mosaic", System.StringComparison.Ordinal))
+            if (
+                !Config.DynamicMosaic.Value
+                && d.name.StartsWith("Mosaic", System.StringComparison.Ordinal)
+            )
+                d.gameObject.SetActive(false);
+            if (
+                Config.HideNovelGlasses.Value
+                && d.name.Contains("glasses", System.StringComparison.OrdinalIgnoreCase)
+            )
                 d.gameObject.SetActive(false);
         }
     }

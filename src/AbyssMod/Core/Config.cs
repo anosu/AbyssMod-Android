@@ -23,6 +23,7 @@ public static class Config
         Path.Combine(Application.persistentDataPath, "il2cpp", "ttcuyuanj");
 
     public static MelonPreferences_Entry<bool> DynamicMosaic;
+    public static MelonPreferences_Entry<bool> HideNovelGlasses;
     public static MelonPreferences_Entry<bool> SoundCaution;
     public static MelonPreferences_Entry<bool> VoiceInterruption;
     public static MelonPreferences_Entry<bool> TitleMovie;
@@ -39,12 +40,14 @@ public static class Config
 
     internal static bool TranslationEnabledAtStartup { get; private set; }
     private static bool _initializing;
+    private static readonly List<Action> Subscriptions = new();
     private static bool _entriesBound;
     private static MelonPreferences_Category _preferenceCategory;
     private static readonly List<MelonPreferences_Category> PreferenceCategories = new();
 
     public static void Initialize()
     {
+        Shutdown();
         _initializing = true;
         try
         {
@@ -68,6 +71,12 @@ public static class Config
     {
         var general = CreateCategory("General");
         DynamicMosaic = CreateEntry(general, "DynamicMosaic", false, "是否启用游戏内动态马赛克");
+        HideNovelGlasses = CreateEntry(
+            general,
+            "HideNovelGlasses",
+            false,
+            "是否隐藏寝室 CG 中角色眼镜；下次载入 Live2D 生效，与马赛克开关独立"
+        );
         SoundCaution = CreateEntry(
             general,
             "SoundCaution",
@@ -156,8 +165,29 @@ public static class Config
         string description
     )
     {
-        var entry = category.CreateEntry(key, defaultValue, description, description);
-        entry.OnEntryValueChanged.Subscribe(
+        MelonLoader.Preferences.ValueValidator validator = null;
+        if (
+            defaultValue is string text
+            && (
+                category.Identifier.Contains("Cache")
+                || category.Identifier.Contains("Font")
+                || key is "CDN" or "Language"
+            )
+        )
+            validator = new ResourceStringValidator(text, key == "CDN");
+        if (key == "NovelLive2DScale")
+            validator = new MelonLoader.Preferences.ValueRange<float>(0.1f, 10f);
+        var entry =
+            category.GetEntry<T>(key)
+            ?? category.CreateEntry(
+                key,
+                defaultValue,
+                description,
+                description,
+                validator: validator
+            );
+        Subscribe(
+            entry,
             (_, newValue) =>
             {
                 if (_initializing)
@@ -165,9 +195,26 @@ public static class Config
                 category.SaveToFile(false);
                 object value = ReferenceEquals(entry, TranslationCryptoKey) ? "***" : newValue;
                 Core.Log.Msg($"[{category.Identifier}] {key} => {value}");
-                Toast.Info($"[{category.Identifier}]", $"{key} => {value}");
+                if (newValue is bool)
+                    Toast.Info($"[{category.Identifier}]", $"{key} => {value}");
             }
         );
         return entry;
+    }
+
+    private static void Subscribe<T>(MelonPreferences_Entry<T> entry, LemonAction<T, T> callback)
+    {
+        entry.OnEntryValueChanged.Subscribe(callback);
+        Subscriptions.Add(() => entry.OnEntryValueChanged.Unsubscribe(callback));
+    }
+
+    internal static void Shutdown()
+    {
+        _initializing = true;
+        foreach (var unsubscribe in Subscriptions)
+            unsubscribe();
+        Subscriptions.Clear();
+        PreferenceCategories.Clear();
+        _entriesBound = false;
     }
 }

@@ -1,5 +1,7 @@
 # AbyssMod Android
 
+本版本针对 [LemonLoader v0.7.4-android.3](https://github.com/LemonLoaderX/LemonLoader/releases/tag/v0.7.4-android.3) 构建，Mod 目标为 `net10.0`，需要 .NET 10 SDK；加载器运行时为 .NET 11，历史 `net6` 目录仍作为引用和安装路径。Loader 编译 DLL 来自正式发行包，不随 Mod ZIP 部署。使用 Patcher 安装该加载器时需 2.1.0 或更新版；从原始游戏 APK 准备新 payload，保留包名、签名及用户数据，勿混用旧运行时。游戏 Interop 保持各项目现有导出，运行验证需使用对应游戏版本。
+
 AbyssMod 的 LemonLoader Android 移植版，为 Unity IL2CPP 客户端提供中文本地化与触屏体验优化。
 
 ## 功能
@@ -39,3 +41,7 @@ python shared/ModEngineering/scripts/project.py package
 ## 开发
 
 源码位于 `src/`，测试位于 `tests/`。项目配置由 `.csproj` 管理，依赖版本由 Git 子模块记录。构建、VS 联调和发布命令见[公共工程说明](https://github.com/anosu/ModEngineering/blob/main/docs/CONVENTIONS.md)。
+
+Android 保留 MelonPreferences 和现有 UserData 路径，配置修改后重启生效。资源地址和路径在赋值或重载时去除首尾空格，无效 HTTP/HTTPS 地址及空路径回退默认值；连续数值编辑只写日志，布尔开关保留 Toast。`General.HideNovelGlasses` 默认 false，可独立隐藏寝室 CG 眼镜。字体加载由入口持有并在卸载时停止协程、解除注册和配置订阅；翻译解密使用显式参数及有限大小的流式读取，界面翻译支持通配路径与占位符规则。
+
+PC 的 ConfigurationManager 标签、快捷键和滚轮缩放属于桌面交互；图片替换与后处理控制依赖尚未验证的 Android 纹理/渲染契约，本版保持现有功能范围。已有游戏互操作引用不能用 PC 导出替代。回归测试覆盖资源配置、解密流、界面规则和缓存；字体、Live2D 和 ARM64 补丁需游戏内验证。

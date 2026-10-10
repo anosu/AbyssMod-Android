@@ -2,9 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Il2CppTMPro;
-using MelonLoader;
-using Utility.Assets;
 using Utility.Notifications;
 
 namespace AbyssMod.Services;
@@ -17,11 +14,8 @@ using UiTranslationTable = Dictionary<string, Dictionary<string, string>>;
 public class TranslationManager
 {
     private readonly TranslationCache _cache;
-    private readonly AssetBundleLoader<TMP_FontAsset> _font;
     private readonly object _loadLock = new();
     private Task _loadTask;
-    private object _fontLoadCoroutine;
-    private TMP_FontAsset _loadedFont;
     private volatile bool _shutdown;
     private volatile bool _staticTranslationsLoaded;
     private volatile MasterDataTranslator _masterDataTranslator;
@@ -29,48 +23,24 @@ public class TranslationManager
     private readonly ConcurrentDictionary<string, Task> _loadingNovels = new();
 
     private volatile Dictionary<string, string> _names;
-    private volatile UiTranslationTable _uiTexts;
+    private volatile UiTextIndex _uiTexts;
 
     private readonly ConcurrentDictionary<string, Dictionary<string, string>> _novels = new();
 
-    public TranslationManager(TranslationCache cache, string fontBundlePath)
+    public TranslationManager(TranslationCache cache)
     {
         _cache = cache;
-        _font = new AssetBundleLoader<TMP_FontAsset>(fontBundlePath);
     }
 
     public void Initialize()
     {
         _shutdown = false;
-        _fontLoadCoroutine = MelonCoroutines.Start(
-            _font.Load(() =>
-            {
-                if (_shutdown)
-                    return;
-
-                _loadedFont = _font.Asset;
-                Logger.Info($"Font loaded: {_loadedFont.name}");
-                if (!TMP_Settings.fallbackFontAssets.Contains(_loadedFont))
-                    TMP_Settings.fallbackFontAssets.Add(_loadedFont);
-            })
-        );
         _ = EnsureStaticTranslationsLoadedAsync();
     }
 
     public void Shutdown()
     {
         _shutdown = true;
-        if (_fontLoadCoroutine != null)
-        {
-            MelonCoroutines.Stop(_fontLoadCoroutine);
-            _fontLoadCoroutine = null;
-        }
-
-        if (_loadedFont != null)
-        {
-            TMP_Settings.fallbackFontAssets.Remove(_loadedFont);
-            _loadedFont = null;
-        }
     }
 
     // ── 静态翻译加载 ────────────────────────
@@ -145,9 +115,12 @@ public class TranslationManager
 
         if (uiTextsTask != null)
         {
-            _uiTexts = await uiTextsTask;
-            if (_uiTexts != null)
-                Logger.Info($"Static translation loaded [ui_texts]. Paths: {_uiTexts.Count}");
+            var table = await uiTextsTask;
+            if (table != null)
+            {
+                _uiTexts = new UiTextIndex(table);
+                Logger.Info($"Static translation loaded [ui_texts]. Paths: {table.Count}");
+            }
             else
                 LogUnavailableStaticTranslation(TranslationPaths.UiTexts);
         }
@@ -170,17 +143,8 @@ public class TranslationManager
 
     public string TranslateUiText(string path, string sourceText)
     {
-        if (
-            string.IsNullOrEmpty(path)
-            || string.IsNullOrEmpty(sourceText)
-            || _uiTexts == null
-            || !_uiTexts.TryGetValue(path, out var translations)
-        )
-            return sourceText;
-
-        return
-            translations.TryGetValue(sourceText, out var translated)
-            && !string.IsNullOrEmpty(translated)
+        var index = _uiTexts;
+        return index != null && index.TryTranslate(path, sourceText, out string translated)
             ? translated
             : sourceText;
     }

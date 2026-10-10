@@ -6,6 +6,22 @@
     </PropertyGroup>
     <ItemGroup>
         <Compile
+            Include="../../src/AbyssMod/Core/ResourceStringValidator.cs"
+            Link="Production/ResourceStringValidator.cs"
+        />
+        <Compile
+            Include="../../src/AbyssMod/Services/TranslationCryptoHandler.cs"
+            Link="Production/TranslationCryptoHandler.cs"
+        />
+        <Compile
+            Include="../../src/AbyssMod/Services/HttpContentReader.cs"
+            Link="Production/HttpContentReader.cs"
+        />
+        <Compile
+            Include="../../src/AbyssMod/Services/UiTextIndex.cs"
+            Link="Production/UiTextIndex.cs"
+        />
+        <Compile
             Include="../../shared/Utility/src/Utility/Caching/*.cs;../../shared/Utility/src/Utility/Cryptography/*.cs"
             Link="Shared/%(Filename)%(Extension)"
         />
