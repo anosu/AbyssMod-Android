@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Utility.Caching;
 using Utility.Cryptography;
@@ -44,14 +45,16 @@ public class TranslationCache
 
     // ══ Manifest ═══════════════════════════════════════════════════════════
 
-    public async Task FetchManifestAsync()
+    public async Task FetchManifestAsync(CancellationToken cancellationToken = default)
     {
         var relativePath = TranslationPaths.BuildRelativePath(TranslationPaths.Manifest, _language);
         var url = TranslationPaths.BuildRemoteUrl(_cdn, relativePath);
         var path = TranslationPaths.BuildCachePath(_cacheDir, relativePath);
-        var previous = await _resources.LoadLocalAsync<Manifest>(path).ConfigureAwait(false);
+        var previous = await _resources
+            .LoadLocalAsync<Manifest>(path, cancellationToken)
+            .ConfigureAwait(false);
         _manifest = await _resources
-            .RefreshAsync<Manifest>(relativePath, path, url)
+            .RefreshAsync<Manifest>(relativePath, path, url, cancellationToken: cancellationToken)
             .ConfigureAwait(false);
         if (_manifest != null)
         {
@@ -65,28 +68,34 @@ public class TranslationCache
 
     // ══ Public load API ════════════════════════════════════════════════════
 
-    public Task<Dictionary<string, string>> LoadAsync(string type, string id = null)
+    public Task<Dictionary<string, string>> LoadAsync(
+        string type,
+        string id = null,
+        CancellationToken cancellationToken = default
+    )
     {
         return LoadWithCacheAsync<Dictionary<string, string>>(
             TranslationPaths.BuildRelativePath(type, _language, id),
             GetManifestHash(type, id),
-            GetHash
+            GetHash,
+            cancellationToken: cancellationToken
         );
     }
 
-    public Task<UiTranslationTable> LoadUiTextsAsync()
+    public Task<UiTranslationTable> LoadUiTextsAsync(CancellationToken cancellationToken = default)
     {
         string type = TranslationPaths.UiTexts;
         return LoadWithCacheAsync<UiTranslationTable>(
             TranslationPaths.BuildRelativePath(type, _language),
             GetManifestHash(type, null),
-            GetUiTextHash
+            GetUiTextHash,
+            cancellationToken: cancellationToken
         );
     }
 
     public Task<
         Dictionary<string, Dictionary<string, Dictionary<string, string>>>
-    > LoadStaticBundleAsync()
+    > LoadStaticBundleAsync(CancellationToken cancellationToken = default)
     {
         string type = TranslationPaths.Static;
         return LoadWithCacheAsync<
@@ -95,7 +104,8 @@ public class TranslationCache
             TranslationPaths.BuildRelativePath(type, _language),
             GetManifestHash(type, null),
             GetBundleHash,
-            fetchWhenUnlisted: true
+            fetchWhenUnlisted: true,
+            cancellationToken: cancellationToken
         );
     }
 
@@ -105,7 +115,8 @@ public class TranslationCache
         string relativePath,
         string expectedHash,
         Func<T, string> computeHash,
-        bool fetchWhenUnlisted = false
+        bool fetchWhenUnlisted = false,
+        CancellationToken cancellationToken = default
     )
         where T : class
     {
@@ -130,7 +141,8 @@ public class TranslationCache
                         computeHash(value),
                         expectedHash,
                         StringComparison.OrdinalIgnoreCase
-                    )
+                    ),
+            cancellationToken: cancellationToken
         );
     }
 

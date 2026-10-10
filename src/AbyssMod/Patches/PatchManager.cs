@@ -22,6 +22,7 @@ public static class PatchManager
         TranslationPatch.Reset();
 
         var harmony = new HarmonyLib.Harmony(ModInfo.Name);
+        _harmony = harmony;
         try
         {
             harmony.PatchAll(typeof(EnhancePatch));
@@ -31,38 +32,30 @@ public static class PatchManager
                 harmony.PatchAll(typeof(UiTranslationPatch));
             }
             harmony.PatchAll(typeof(TranslationPatch));
-            _harmony = harmony;
         }
         catch
         {
-            try
-            {
-                harmony.UnpatchSelf();
-            }
-            catch (System.Exception e)
-            {
-                Logger.Error($"Harmony rollback failed: {e}");
-            }
-            EnhancePatch.Reset();
-            MasterDataPatch.Reset();
-            TranslationPatch.Reset();
+            Shutdown();
             throw;
         }
     }
 
-    public static void Shutdown()
+    public static bool Shutdown()
     {
         var harmony = _harmony;
-        _harmony = null;
         try
         {
             harmony?.UnpatchSelf();
         }
-        finally
+        catch (System.Exception e)
         {
-            EnhancePatch.Reset();
-            MasterDataPatch.Reset();
-            TranslationPatch.Reset();
+            Logger.Error($"Harmony shutdown failed: {e}");
+            return false;
         }
+        _harmony = null;
+        EnhancePatch.Reset();
+        MasterDataPatch.Reset();
+        TranslationPatch.Reset();
+        return true;
     }
 }

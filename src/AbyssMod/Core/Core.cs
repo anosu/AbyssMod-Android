@@ -65,13 +65,15 @@ public sealed class Core : MelonMod
     {
         try
         {
-            PatchManager.Shutdown();
+            if (!PatchManager.Shutdown())
+                return;
         }
         catch (Exception e)
         {
             Log?.Error($"Patch shutdown failed: {e}");
+            return;
         }
-        finally
+        // 只有补丁移除成功后，才释放它们访问的运行依赖。
         {
             try
             {

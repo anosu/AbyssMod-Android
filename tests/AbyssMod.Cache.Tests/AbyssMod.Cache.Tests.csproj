@@ -6,6 +6,10 @@
     </PropertyGroup>
     <ItemGroup>
         <Compile
+            Include="../../src/AbyssMod/Services/TranslationManager.cs"
+            Link="Production/TranslationManager.cs"
+        />
+        <Compile
             Include="../../src/AbyssMod/Core/ResourceStringValidator.cs"
             Link="Production/ResourceStringValidator.cs"
         />

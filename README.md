@@ -40,6 +40,8 @@ python shared/ModEngineering/scripts/project.py package
 
 ## 开发
 
+翻译会话在卸载时取消 manifest、静态资源和剧情请求，取消不弹失败通知。补丁安装部分失败后会回滚；回滚或卸载失败时保留清理句柄与运行依赖。字体可能被游戏文本持有，按进程生命周期保留，不支持热替换或强制销毁。
+
 源码位于 `src/`，测试位于 `tests/`。项目配置由 `.csproj` 管理，依赖版本由 Git 子模块记录。构建、VS 联调和发布命令见[公共工程说明](https://github.com/anosu/ModEngineering/blob/main/docs/CONVENTIONS.md)。
 
 Android 保留 MelonPreferences 和现有 UserData 路径，配置修改后重启生效。资源地址和路径在赋值或重载时去除首尾空格，无效 HTTP/HTTPS 地址及空路径回退默认值；连续数值编辑只写日志，布尔开关保留 Toast。`General.HideNovelGlasses` 默认 false，可独立隐藏寝室 CG 眼镜。字体加载由入口持有并在卸载时停止协程、解除注册和配置订阅；翻译解密使用显式参数及有限大小的流式读取，界面翻译支持通配路径与占位符规则。
